@@ -64,10 +64,10 @@ namespace View
           for(int i = 1; i <= numBlocks; i++)
           { 
               Console.Write("🟩");
-              Thread.Sleep(timeInterval);
+              // Thread.Sleep(timeInterval);
           }
           Console.Write($"\n\n{String.Join("", Enumerable.Repeat(" ", numBlocks/6))}  🏁 START! 🏁");
-          Thread.Sleep(2*timeInterval);      
+          // Thread.Sleep(2*timeInterval);      
       }
 
       public static void PrintEndMessage()

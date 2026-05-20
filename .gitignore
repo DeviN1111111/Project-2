@@ -1,0 +1,60 @@
+# Build results
+bin/
+obj/
+*.dll
+*.exe
+*.pdb
+*.so
+*.dylib
+
+# Visual Studio
+.vs/
+.vscode/
+*.user
+*.sln.iml
+*.sln.docstates
+
+# IDE
+.idea/
+*.swp
+*.swo
+*~
+.DS_Store
+Thumbs.db
+
+# NuGet
+*.nupkg
+*.snupkg
+.nuget/
+
+# Local environment
+.env
+.env.local
+launchSettings.json
+
+# Test results
+TestResults/
+*.trx
+*.coverage
+
+# Rider
+.idea/
+.idea_modules/
+*.iml
+*.iws
+
+# User-specific files
+*.suo
+*.userosscache
+*.sln.iml
+
+# Build results of an ATL Project
+[Dd]ebugPS/
+[Rr]eleasePS/
+
+# Publish
+PublishProfiles/
+
+# Misc
+*.log
+*.tmp
