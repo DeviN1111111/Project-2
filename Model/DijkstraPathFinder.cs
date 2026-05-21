@@ -1,3 +1,5 @@
+using System.Data;
+
 namespace Model
 {
     public class DijkstraPathFinder : IPathFinder
@@ -7,8 +9,81 @@ namespace Model
         
         public void FindPath(Maze maze, int[] pos, Queue<int[]> visitedPositions)
         {
-            //ToDo implement this method
-            visitedPositions.Enqueue(pos); //remove this line
+            // de grote van de maze
+            int rows = maze.MazeArray.Length;
+            int cols = maze.MazeArray[0].Length;
+            
+            // setup
+            var Distance = new int[rows, cols];
+            var Previous = new int[rows, cols];
+            bool[,] VisitedNodes = new bool[rows, cols];
+            
+            for (int row = 0; row < rows; row++)
+            {
+                for (int col = 0; col < cols; col++)
+                {
+                    Distance[row, col] = int.MaxValue;
+
+                    Previous[row, col] = -1;
+
+                    VisitedNodes[row, col] = false;
+                }
+            }
+
+            while(true)
+            {
+                int min = int.MaxValue;
+                int[] current = null;
+
+                for(int row = 0; row < rows; rows++)
+                {
+                    for(int col = 0; col < cols; col++)
+                    {
+                        if(!VisitedNodes[row, col] && Distance[row, col] < min)
+                        {
+                            min = Distance[row, col];
+                            current = new int[] { row, col };
+                        }
+                    }
+                }
+
+                if(current == null) break;
+
+                int Row = current[0];
+                int Col = current[1];
+
+                // zet als visited
+                VisitedNodes[Row, Col] = true;
+                visitedPositions.Enqueue(current);
+
+                if (Row == maze.End[0] && Col == maze.End[1]) break;
+
+                foreach(var move in maze.moves)
+                {
+                    int newCol = Col + move[0];
+                    int newRow = Row + move[1];
+
+                    if (!maze.IsValidMove(newCol, newRow))
+                        continue;
+
+                    if (VisitedNodes[newRow, newCol])
+                        continue;
+                }
+            }
+
+                //                     int alt = Distance[row, col] + 1; // weight = 1 for now
+
+                //         if (alt < Distance[nr, nc])
+                //         {
+                //             Distance[nr, nc] = alt;
+
+                //             // store previous as single value (flattened index)
+                //             Previous[nr, nc] = row * cols + col;
+                //         }
+                //     }
+                // }
+
+
         }
    }
 }
