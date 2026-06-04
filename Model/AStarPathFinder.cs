@@ -13,17 +13,20 @@ namespace Model
             int cols = maze.MazeArray[0].Length;
 
             // setup
-            var Distance = new int[rows, cols];
+            var g_score = new int[rows, cols]; // dit moet f_score en g_score zijn, astar heeft geen distance array
+            var f_score = new int[rows, cols];
             var Previous = new int[rows, cols];
             bool[,] VisitedNodes = new bool[rows, cols];
 
-            Distance[pos[0], pos[1]] = 0;
+            g_score[pos[0], pos[1]] = 0;
+            f_score[pos[0], pos[1]] = Heuristic(pos[0], pos[1], maze);
 
             for (int row = 0; row < rows; row++)
             {
                 for (int col = 0; col < cols; col++)
                 {
-                    Distance[row, col] = int.MaxValue;
+                    g_score[row, col] = int.MaxValue;
+                    f_score[row, col] = int.MaxValue;
 
                     Previous[row, col] = -1;
 
@@ -40,7 +43,7 @@ namespace Model
                 {
                     for(int col = 0; col < cols; col++)
                     {
-                        int fScore = Distance[row, col] + Heuristic(row, col, maze);
+                        int fScore = g_score[row, col] + Heuristic(row, col, maze);
 
                         if (!VisitedNodes[row, col] && fScore < min)
                         {
@@ -72,11 +75,13 @@ namespace Model
                     if (VisitedNodes[newRow, newCol])
                         continue;
 
-                    int newDistance = Distance[Row, Col] + 1;
+                    int newGScore = g_score[Row, Col] + 1;
+                    int newFScore = newGScore + Heuristic(newRow, newCol, maze);
 
-                    if (newDistance < Distance[newRow, newCol])
+                    if (newGScore < g_score[newRow, newCol])
                     {
-                        Distance[newRow, newCol] = newDistance;
+                        g_score[newRow, newCol] = newGScore;
+                        f_score[newRow, newCol] = newFScore;
                         Previous[newRow, newCol] = Row * cols + Col;
                     }
                 }
