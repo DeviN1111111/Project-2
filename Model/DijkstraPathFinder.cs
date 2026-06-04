@@ -81,6 +81,7 @@ namespace Model
 
             // Reconstruct path backwards from End to Begin
             int[] goal = maze.End;
+
             Stack<int[]> Path = new Stack<int[]>();
 
             while (!(goal[0] == pos[0] && goal[1] == pos[1]))
