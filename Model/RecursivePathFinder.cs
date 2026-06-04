@@ -21,17 +21,10 @@ namespace Model
             {
                 int newRow = row + move[0];
                 int newCol = col + move[1];
-                
-                int countBefore = visitedPositions.Count;
 
                 FindPath(maze, new int[] { newRow, newCol }, visitedPositions);
 
                 if(AlreadyVisited(visitedPositions, maze.End)) return; // als je het eind hebt gevonden
-
-                while(visitedPositions.Count > countBefore)
-                {
-                    visitedPositions.Dequeue(); // als je terugkomt van een doodlopende weg, verwijder je de posities van die weg uit de visitedPositions
-                }
             }
         }
 
