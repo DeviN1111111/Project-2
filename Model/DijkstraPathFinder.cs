@@ -30,12 +30,14 @@ namespace Model
                 }
             }
 
+            Distance[pos[0], pos[1]] = 0;
+
             while(true)
             {
                 int min = int.MaxValue;
                 int[] current = null;
 
-                for(int row = 0; row < rows; rows++)
+                for(int row = 0; row < rows; row++)
                 {
                     for(int col = 0; col < cols; col++)
                     {
@@ -54,7 +56,7 @@ namespace Model
 
                 // zet als visited
                 VisitedNodes[Row, Col] = true;
-                visitedPositions.Enqueue(current);
+                // visitedPositions.Enqueue(current);
 
                 if (Row == maze.End[0] && Col == maze.End[1]) break;
 
@@ -63,27 +65,44 @@ namespace Model
                     int newCol = Col + move[0];
                     int newRow = Row + move[1];
 
-                    if (!maze.IsValidMove(newCol, newRow))
+                    if (!maze.IsValidMove(newRow, newCol))
                         continue;
 
                     if (VisitedNodes[newRow, newCol])
                         continue;
+                    int alt = Distance[Row, Col] + 1;
+                    if (alt < Distance[newRow, newCol])
+                    {
+                        Distance[newRow, newCol] = alt;
+                        Previous[newRow, newCol] = Row * cols + Col;
+                    }
                 }
             }
 
-                //                     int alt = Distance[row, col] + 1; // weight = 1 for now
+            // Reconstruct path backwards from End to Begin
+            int[] goal = maze.End;
+            Stack<int[]> Path = new Stack<int[]>();
 
-                //         if (alt < Distance[nr, nc])
-                //         {
-                //             Distance[nr, nc] = alt;
+            while (!(goal[0] == pos[0] && goal[1] == pos[1]))
+            {
+                Path.Push(new int[] { goal[0], goal[1] });
+                int prevIndex = Previous[goal[0], goal[1]];
+                if (prevIndex == -1) break; // No path found
+                goal[0] = prevIndex / cols;
+                goal[1] = prevIndex % cols;
+            }
 
-                //             // store previous as single value (flattened index)
-                //             Previous[nr, nc] = row * cols + col;
-                //         }
-                //     }
-                // }
+            Path.Push(pos); // Add the starting position
 
-
+            while(Path.Count > 0)
+            {
+                visitedPositions.Enqueue(Path.Pop());
+            }
         }
+
+        // public int GetNodeID(int width, int[] pos)
+        // {
+        //     return pos[0] * width + pos[1];
+        // }
    }
 }
