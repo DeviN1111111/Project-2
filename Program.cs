@@ -34,8 +34,8 @@ xx            xx            xx.";
 
         //-----------constants:------------
         const int rows = 25, cols = 2*rows;
-        const int timeInterval = 400;
         Console.OutputEncoding = Encoding.UTF8;
+        const int timeInterval = 10;
         //---------------------------------
         
         //Predefined maze:
