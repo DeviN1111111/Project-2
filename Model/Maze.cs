@@ -1,5 +1,6 @@
 
 using System.Data;
+using System.Security.Cryptography;
 
 namespace Model
 {
@@ -26,17 +27,149 @@ namespace Model
             MazeArray = ToMazeArray(lines);
             MazeMDArray = ToMazeMDArray(lines);
         }
+    void GenerateMaze(int rows = 21, int cols = 41)
+    {
+        // if(rows < 4 || cols < 4) {rows = 20; cols = 40;}
+        // if(rows % 2 != 0) {rows++;}
+        // if(cols % 2 != 0) {cols++;}
 
-        void GenerateMaze(int rows = 20, int cols = 40)
+        //ToDo...
+
+        if (rows % 2 == 0) rows++;
+        if (cols % 2 == 0) cols++;
+
+
+        // Creates maze filled with walls
+        MazeArray = new int[rows][];
+
+        for (int r = 0; r < rows; r++)
         {
-            if(rows < 4 || cols < 4) {rows = 20; cols = 40;}
-            if(rows % 2 != 0) {rows++;}
-            if(cols % 2 != 0) {cols++;}
-
-            //ToDo...
-
-            GenerateFromText(MazeGrids.mazeText); //remove this line and implement the task
+            MazeArray[r] = new int[cols];
+            for (int c = 0; c < cols; c++)
+            {
+                MazeArray[r][c] = -1;
+            }
         }
+
+        // Set random starting room
+        // Walls are even numbers and rooms odd numbers
+        var rng = new Random();
+
+        // Formula for total amount of rooms (rows/cols - 1) / 2
+        int roomRows = (rows - 1) / 2;
+        int roomCols = (cols - 1) / 2;
+        // Formula to get index of room number 2 * room number + 1
+        // Room numbers start at 0!!!!
+        int startRow = 2 * rng.Next(roomRows) + 1; 
+        int startCol = 2 * rng.Next(roomCols) + 1;
+
+        // Set start position as room
+        MazeArray[startRow][startCol] = 0;
+
+        // Put start room in stack
+        var stack = new Stack<(int row, int col)>();
+        stack.Push((startRow, startCol));
+
+        // Carve the paths
+        while (stack.Count > 0)
+        {
+            var current = stack.Peek();
+
+            // directions to next rooom
+            var directions = new (int dRow, int dCol) []
+            {
+                (-2, 0), //up
+                (2, 0), //down
+                (0, -2), //left
+                (0, 2) //right
+            };
+
+            // shuffle the directions array
+            for (int i = directions.Length -1; i > 0; i--) // count downwards
+            {
+                int j = rng.Next(i + 1); // pick random index to swap
+                var temp = directions[i];
+                directions[i] = directions[j];
+                directions[j] = temp;
+            }
+
+            bool moved = false;
+
+            foreach (var dir in directions)
+            {
+                // choose the neighbour
+                int nRow = current.row + dir.dRow;
+                int nCol = current.col + dir.dCol;
+
+                // check if it is inside maze and not outerwal
+                bool insideGrid = nRow > 0 && nRow < rows -1
+                                && nCol > 0 && nCol < cols -1;
+
+                // check if it is a wall
+                bool isWall = insideGrid && MazeArray[nRow][nCol] == -1;
+
+                if (isWall)
+                {
+                    // carve the wall between the current and neighbour
+                    int wallRow = current.row + dir.dRow / 2;
+                    int wallCol = current.col + dir.dCol / 2;
+                    MazeArray[wallRow][wallCol] = 0;
+                    // mark neighbour as passaeg
+                    MazeArray[nRow][nCol] = 0;
+                    
+                    stack.Push((nRow, nCol));
+                    moved = true;
+                    break;
+                }
+            }
+            if (!moved)
+            {
+                stack.Pop();
+            }
+        }
+
+        // pick random end position
+        int endRow, endCol;
+        do
+        {
+            endRow = 2 * rng.Next(roomRows) + 1;
+            endCol = 2 * rng.Next(roomCols) + 1;
+        }
+        while (endRow == startRow && endCol == startCol);
+        // assign start and end positions
+        MazeArray[startRow][startCol] = 1;
+        MazeArray[endRow][endCol] = 2;
+        Begin = new int[] { startRow, startCol };
+        End = new int[] { endRow, endCol };
+
+        // fix view array
+        int displayRows = rows - 1;
+        int displayCols = cols - 1;
+
+        int[][] croppedMazeArray = new int[displayRows][];
+
+        for (int r = 0; r < displayRows; r++)
+        {
+            croppedMazeArray[r] = new int[displayCols];
+
+            for (int c = 0; c < displayCols; c++)
+            {
+                croppedMazeArray[r][c] = MazeArray[r][c];
+            }
+        }
+
+        MazeArray = croppedMazeArray;
+
+        MazeMDArray = new int[displayRows, displayCols];
+
+        for (int r = 0; r < displayRows; r++)
+        {
+            for (int c = 0; c < displayCols; c++)
+            {
+                MazeMDArray[r, c] = MazeArray[r][c];
+            }
+        }
+    }
 
         int[][] ToMazeArray(string maze)
         {
