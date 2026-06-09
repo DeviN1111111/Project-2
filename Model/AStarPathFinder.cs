@@ -52,23 +52,6 @@ namespace Model
                     }
                 }
 
-                // for(int row = 0; row < rows; row++)
-                // {
-                //     for(int col = 0; col < cols; col++)
-                //     {
-                //         if (VisitedNodes[row, col] || g_score[row, col] == int.MaxValue)
-                //             continue;
-
-                //         int fScore = g_score[row, col] + Heuristic(row, col, maze);
-
-                //         if (fScore < min)
-                //         {
-                //             min = fScore;
-                //             current = new int[] { row, col };
-                //         }
-                //     }
-                // }
-
                 if(current == null) break;
 
                 int Row = current[0];
@@ -99,7 +82,7 @@ namespace Model
                     {
                         g_score[newRow, newCol] = newGScore;
                         f_score[newRow, newCol] = newFScore;
-                        Previous[newRow, newCol] = Row * cols + Col;
+                        Previous[newRow, newCol] = Row * cols + Col; //Naam closelist
                     }
                 }
             }

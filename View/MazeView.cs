@@ -135,6 +135,12 @@ namespace View
         
             System.Console.WriteLine();
 
+            var queue = new Queue<string>();
+            foreach(var emoji in symbolsArr)
+            {
+                queue.Enqueue(emoji);
+            }
+
             // Loop over the elements of the maze array
             // and display as characters.
             for (int rowIdx = 0; rowIdx < array.Length; rowIdx++)
@@ -148,9 +154,9 @@ namespace View
                             Console.Write("🟦");   //walls
                             break;
                         case 1:                    //begin 
-                            //if (currPos[0] == rowIdx && currPos[1] == colIdx)
-                            //    Console.Write("⚽️");
-                            //else
+                            if (currPos[0] == rowIdx && currPos[1] == colIdx)
+                               Console.Write("⚽️");
+                            else
                                 Console.Write("🏠");
                             break;
                         case 2:
@@ -163,7 +169,14 @@ namespace View
                             if (currPos[0] == rowIdx && currPos[1] == colIdx)
                                 Console.Write("⚽️");
                             else if (visitedPositions.Any(_ => _[0] == rowIdx && _[1] == colIdx))
-                                Console.Write("🏃");  
+                            {
+                                // int posIdx = currPos.FindIndex(p => p[0] == rowIdx && p[1] == colIdx);
+                                // if (posIdx >= 0 && posIdx < symbolsArr.Length)
+                                //     Console.Write(symbolsArr[posIdx]);
+                                // else
+                                //     Console.Write("🏃");
+                                Console.Write(queue.Dequeue());
+                            } 
                             else
                                 Console.Write("  ");
                             break;
@@ -334,6 +347,12 @@ namespace View
                 Console.BackgroundColor = ConsoleColor.White;
                 Console.WriteLine();
 
+                var queue = new Queue<string>();
+                foreach(var emoji in symbolsArr)
+                {
+                    queue.Enqueue(emoji);
+                }
+
                 // Loop over the elements of the maze array
                 // and display as characters.
                 for (int rowIdx = 0; rowIdx < array.GetLength(0); rowIdx++)
@@ -364,7 +383,7 @@ namespace View
                                 }
                                 else if (shownPositions.Any(_ => _[0] == rowIdx && _[1] == colIdx))
                                 {
-                                    Console.Write("🏃");
+                                    Console.Write(queue.Dequeue());
                                 }
                                 else
                                     Console.Write("  ");
