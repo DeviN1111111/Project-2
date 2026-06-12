@@ -18,6 +18,7 @@ namespace Model
             var Previous = new int[rows, cols];
             bool[,] VisitedNodes = new bool[rows, cols];
             
+            // Initialiseer alle posities met oneindig, geen vorige positie en niet bezocht
             for (int row = 0; row < rows; row++)
             {
                 for (int col = 0; col < cols; col++)
@@ -80,7 +81,7 @@ namespace Model
             }
 
             // Reconstruct path backwards from End to Begin
-            int[] goal = maze.End;
+            int[] goal = new int[] { maze.End[0], maze.End[1] }; // op deze manier want anders overwrite je de maze.End waarde
 
             Stack<int[]> Path = new Stack<int[]>();
 
@@ -100,10 +101,5 @@ namespace Model
                 visitedPositions.Enqueue(Path.Pop());
             }
         }
-
-        // public int GetNodeID(int width, int[] pos)
-        // {
-        //     return pos[0] * width + pos[1];
-        // }
    }
 }

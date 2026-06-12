@@ -1,4 +1,3 @@
-
 namespace Model
 {
     public class AStarPathFinder : IPathFinder
@@ -13,11 +12,12 @@ namespace Model
             int cols = maze.MazeArray[0].Length;
 
             // setup
-            var g_score = new int[rows, cols]; // dit moet f_score en g_score zijn, astar heeft geen distance array
+            var g_score = new int[rows, cols];
             var f_score = new int[rows, cols];
             var Previous = new int[rows, cols];
             bool[,] VisitedNodes = new bool[rows, cols];
 
+            // Initialiseer alle posities met oneindig, geen vorige positie en niet bezocht
             for (int row = 0; row < rows; row++)
             {
                 for (int col = 0; col < cols; col++)
@@ -35,6 +35,7 @@ namespace Model
 
             while(true)
             {
+                // Zoek de onbezochte positie met de laagste f_score (g_score + heuristic)
                 int min = int.MaxValue;
                 int[] current = null!;
 
@@ -59,22 +60,25 @@ namespace Model
 
                 // zet als visited
                 VisitedNodes[Row, Col] = true;
-                // visitedPositions.Enqueue(current);
 
                 if (Row == maze.End[0] && Col == maze.End[1]) break;
 
+                // Check elk mogelijke move van de huidige positie
                 foreach(var move in maze.moves)
                 {
                     int newCol = Col + move[1];
                     int newRow = Row + move[0];
 
-                    // if (!maze.IsValidMove(newCol, newRow))
+                    // Controleer of de nieuwe positie geldig is
                     if (!maze.IsValidMove(newRow, newCol))
                         continue;
 
+                    // Sla over als dit al bezocht is
                     if (VisitedNodes[newRow, newCol])
                         continue;
 
+                    // Bereken de werkelijke afstand van start naar deze buur
+                    // (huidige g_score + 1 voor één stap)
                     int newGScore = g_score[Row, Col] + 1;
                     int newFScore = newGScore + Heuristic(newRow, newCol, maze);
 
@@ -82,12 +86,11 @@ namespace Model
                     {
                         g_score[newRow, newCol] = newGScore;
                         f_score[newRow, newCol] = newFScore;
-                        Previous[newRow, newCol] = Row * cols + Col; //Naam closelist
+                        Previous[newRow, newCol] = Row * cols + Col; //index van de vorige positie
                     }
                 }
             }
 
-            // Reconstruct path backwards from End to Begin
             int[] goal = new int[] { maze.End[0], maze.End[1] };
             Stack<int[]> Path = new Stack<int[]>();
 
@@ -108,6 +111,7 @@ namespace Model
             }
         }
 
+        //geschatte afstand tot eindpunt, (Manhattan)
         public int Heuristic(int row, int col, Maze maze)
         {
             return Math.Abs(row - maze.End[0]) + Math.Abs(col - maze.End[1]);
