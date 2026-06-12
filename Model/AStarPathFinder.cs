@@ -69,11 +69,9 @@ namespace Model
                     int newCol = Col + move[1];
                     int newRow = Row + move[0];
 
-                    // Controleer of de nieuwe positie geldig is
                     if (!maze.IsValidMove(newRow, newCol))
                         continue;
 
-                    // Sla over als dit al bezocht is
                     if (VisitedNodes[newRow, newCol])
                         continue;
 
