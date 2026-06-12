@@ -57,10 +57,10 @@ namespace Model
 
                 // zet als visited
                 VisitedNodes[Row, Col] = true;
-                // visitedPositions.Enqueue(current);
 
                 if (Row == maze.End[0] && Col == maze.End[1]) break;
 
+                // Check elk mogelijke move van de huidige positie
                 foreach(var move in maze.moves)
                 {
                     int newCol = Col + move[0];
