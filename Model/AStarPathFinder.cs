@@ -13,26 +13,28 @@ namespace Model
             int cols = maze.MazeArray[0].Length;
 
             // setup
-            var Distance = new int[rows, cols];
+            var g_score = new int[rows, cols]; // dit moet f_score en g_score zijn, astar heeft geen distance array
+            var f_score = new int[rows, cols];
             var Previous = new int[rows, cols];
             bool[,] VisitedNodes = new bool[rows, cols];
 
-            // Initialiseer alle posities met oneindig, geen vorige positie en niet bezocht
             for (int row = 0; row < rows; row++)
             {
                 for (int col = 0; col < cols; col++)
                 {
-                    Distance[row, col] = int.MaxValue;
+                    g_score[row, col] = int.MaxValue;
+                    f_score[row, col] = int.MaxValue;
 
                     Previous[row, col] = -1;
 
                     VisitedNodes[row, col] = false;
                 }
             }
+            g_score[pos[0], pos[1]] = 0;
+            f_score[pos[0], pos[1]] = Heuristic(pos[0], pos[1], maze);
 
             while(true)
             {
-                // Zoek de onbezochte positie met de laagste f_score (g_score + heuristic)
                 int min = int.MaxValue;
                 int[] current = null!;
 
@@ -40,9 +42,9 @@ namespace Model
                 {
                     for(int col = 0; col < cols; col++)
                     {
-                        int fScore = Distance[row, col] + Heuristic(row, col, maze);
+                        int fScore = g_score[row, col] + Heuristic(row, col, maze);
 
-                        if (!VisitedNodes[row, col] && fScore < min)
+                        if (!VisitedNodes[row, col] && fScore < min && g_score[row, col] != int.MaxValue)
                         {
                             min = fScore;
                             current = new int[] { row, col };
@@ -57,36 +59,55 @@ namespace Model
 
                 // zet als visited
                 VisitedNodes[Row, Col] = true;
-                visitedPositions.Enqueue(current);
+                // visitedPositions.Enqueue(current);
 
                 if (Row == maze.End[0] && Col == maze.End[1]) break;
 
-                // Check elk mogelijke move van de huidige positie
                 foreach(var move in maze.moves)
                 {
-                    int newCol = Col + move[0];
-                    int newRow = Row + move[1];
+                    int newCol = Col + move[1];
+                    int newRow = Row + move[0];
 
-                    if (!maze.IsValidMove(newCol, newRow))
+                    // if (!maze.IsValidMove(newCol, newRow))
+                    if (!maze.IsValidMove(newRow, newCol))
                         continue;
 
                     if (VisitedNodes[newRow, newCol])
                         continue;
 
-                    // Bereken nieuwe afstand (g_score) = huidige afstand + 1
-                    int newDistance = Distance[Row, Col] + 1;
+                    int newGScore = g_score[Row, Col] + 1;
+                    int newFScore = newGScore + Heuristic(newRow, newCol, maze);
 
-                    // Alleen updaten als we een kortere route hebben gevonden
-                    if (newDistance < Distance[newRow, newCol])
+                    if (newGScore < g_score[newRow, newCol])
                     {
-                        Distance[newRow, newCol] = newDistance; // Update de afstand
-                        Previous[newRow, newCol] = Row * cols + Col; // Sla de vorige positie op als een enkele index
+                        g_score[newRow, newCol] = newGScore;
+                        f_score[newRow, newCol] = newFScore;
+                        Previous[newRow, newCol] = Row * cols + Col; //Naam closelist
                     }
                 }
             }
+
+            // Reconstruct path backwards from End to Begin
+            int[] goal = new int[] { maze.End[0], maze.End[1] };
+            Stack<int[]> Path = new Stack<int[]>();
+
+            while (!(goal[0] == pos[0] && goal[1] == pos[1]))
+            {
+                Path.Push(new int[] { goal[0], goal[1] });
+                int prevIndex = Previous[goal[0], goal[1]];
+                if (prevIndex == -1) break; // No path found
+                goal[0] = prevIndex / cols;
+                goal[1] = prevIndex % cols;
+            }
+
+            Path.Push(pos); // Add the starting position
+
+            while(Path.Count > 0)
+            {
+                visitedPositions.Enqueue(Path.Pop());
+            }
         }
 
-        //geschatte afstand tot eindpunt, (Manhattan)
         public int Heuristic(int row, int col, Maze maze)
         {
             return Math.Abs(row - maze.End[0]) + Math.Abs(col - maze.End[1]);
